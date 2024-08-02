@@ -85,7 +85,7 @@ local function Update()
         local NewValue = TweenService:GetValue(Delta, TweenStyle, TweenDirection)
         local CurrentPos = Label.Position
         local PreviousBounds = CalculateBounds(PreviousObjects)
-        local TargetPos = UDim2.new(0, 0, 0, PreviousBounds.Y + (Padding * #PreviousObjects))
+        local TargetPos = Udim2.new(0, 0, 0, PreviousBounds.Y + (Padding * #PreviousObjects))
         Label.Position = CurrentPos:Lerp(TargetPos, NewValue)
         table.insert(PreviousObjects, Label)
     end
@@ -189,14 +189,12 @@ return {
         local Description = Properties.Description
         local Duration = Properties.Duration or 5
         local ImageID = Properties.ImageID or "17649496928" -- Default ImageID if none is provided
-        local AutoImageScale = Properties.AutoImageScale or false -- Default to false if not provided
+        local AutoImageScale = Properties.AutoImageScale -- New field for automatic image scaling
         local ContainerPosition = Properties.ContainerPosition -- New field for Container Position
 
         -- Optionally create a new container if position is provided
-        if ContainerPosition then
-            Container:Destroy() -- Remove the existing container if it exists
-            Container = CreateContainer(ContainerPosition) -- Create a new container with the provided position
-        end
+        Container:Destroy() -- Remove the existing container if it exists
+        Container = CreateContainer(ContainerPosition) -- Create a new container with the provided position
 
         if Title or Description then -- Check that user has provided title and/or description
             local Y = Title and 26 or 0
@@ -213,7 +211,8 @@ return {
 
             -- Create and set up the icon
             local Icon = Image(string.format("rbxthumb://type=Asset&id=%s&w=150&h=150", ImageID))
-            Icon.Size = AutoImageScale and UDim2.new(0, 40, 0, Y) or UDim2.new(0, 40, 0, 40) -- Adjust size based on AutoImageScale
+            local IconSize = AutoImageScale and UDim2.new(0, Y, 0, Y) or UDim2.new(0, 40, 0, 40) -- Adjust size based on AutoImageScale
+            Icon.Size = IconSize
             Icon.Position = UDim2.new(0, 5, 0, AutoImageScale and 0 or (Y - 40) / 2) -- Adjust position based on AutoImageScale
             Icon.Parent = NewLabel
 
@@ -236,5 +235,5 @@ return {
             table.insert(InstructionObjects, { NewLabel, 0, false })
             coroutine.wrap(FadeOutAfter)(NewLabel, Duration)
         end
-    end,
+    end
 }
