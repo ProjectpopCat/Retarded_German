@@ -105,7 +105,7 @@ local DescriptionSettings = {
     Size = 14
 }
 
-local MaxWidth = (Container.AbsoluteSize.X - Padding - DescriptionPadding - 50) -- Adjusted for the icon width
+local MaxWidth = (Container.AbsoluteSize.X - Padding - DescriptionPadding - 60) -- Adjusted for the icon width
 
 local function Label(Text, Font, Size, Button)
     local Label = Instance.new(string.format("Text%s", Button and "Button" or "Label"))
@@ -206,27 +206,28 @@ return {
                 Y += 8
             end
             local NewLabel = Round2px()
-            NewLabel.Size = UDim2.new(1, 0, 0, Y + 50) -- Adjust height to include icon space
+            local LabelHeight = math.max(Y, 60) -- Ensure label height is at least 60 to accommodate the icon
+            NewLabel.Size = UDim2.new(1, 0, 0, LabelHeight)
             NewLabel.Position = UDim2.new(-1, 20, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
 
             -- Create and set up the icon
             local Icon = Image(string.format("rbxthumb://type=Asset&id=%s&w=150&h=150", ImageID))
-            local IconSize = AutoImageScale and UDim2.new(0, Y, 0, Y) or UDim2.new(0, 40, 0, 40) -- Adjust size based on AutoImageScale
+            local IconSize = AutoImageScale and UDim2.new(0, LabelHeight, 0, LabelHeight) or UDim2.new(0, 60, 0, 60) -- Adjust size based on AutoImageScale
             Icon.Size = IconSize
-            Icon.Position = UDim2.new(0, 5, 0, AutoImageScale and 5 or (Y - 40) / 2) -- Adjust position based on AutoImageScale
+            Icon.Position = UDim2.new(0, 5, 0, 0) -- Position the icon to the left
             Icon.Parent = NewLabel
 
             if Title then
                 local NewTitle = TitleLabel(Title)
-                NewTitle.Size = UDim2.new(1, -60, 0, 26) -- Adjusted size for the title to make space for the icon
-                NewTitle.Position = UDim2.fromOffset(50, 0) -- Adjusted position to make space for the icon
+                NewTitle.Size = UDim2.new(1, -70, 0, 26) -- Adjusted size for the title to make space for the icon
+                NewTitle.Position = UDim2.fromOffset(70, 0) -- Adjusted position to make space for the icon
                 NewTitle.Parent = NewLabel
             end
             if Description then
                 local NewDescription = DescriptionLabel(Description)
                 NewDescription.TextWrapped = true
-                NewDescription.Size = UDim2.new(1, -60, 1, Title and -26 or 0) -- Adjusted size for the description to make space for the icon
-                NewDescription.Position = UDim2.fromOffset(50, Title and 26 or 0) -- Adjusted position to make space for the icon
+                NewDescription.Size = UDim2.new(1, -70, 1, Title and -26 or 0) -- Adjusted size for the description to make space for the icon
+                NewDescription.Position = UDim2.fromOffset(70, Title and 26 or 0) -- Adjusted position to make space for the icon
                 NewDescription.TextYAlignment = Enum.TextYAlignment[Title and "Top" or "Center"]
                 NewDescription.Parent = NewLabel
             end
