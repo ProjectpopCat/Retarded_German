@@ -207,8 +207,8 @@ return {
             end
             local NewLabel = Round2px()
             local LabelHeight = math.max(Y, 60) -- Ensure label height is at least 60 to accommodate the icon
-            NewLabel.Size = UDim2.new(1, 0, 0, LabelHeight)
-            NewLabel.Position = UDim2.new(-1, 100, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
+            NewLabel.Size = UDim2.new(5, 0, 0, LabelHeight)
+            NewLabel.Position = UDim2.new(-1, 20, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
 
             local Icon = Image(string.format("rbxthumb://type=Asset&id=%s&w=150&h=150", ImageID))
             local IconSize = AutoImageScale and UDim2.new(0, LabelHeight, 0, LabelHeight) or UDim2.new(0, 60, 0, 60) -- Adjust size based on AutoImageScale
