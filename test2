@@ -183,7 +183,7 @@ end
 return {
     Notify = function(Properties)
         local Properties = typeof(Properties) == "table" and Properties or {}
-        
+
         -- Die Standardeinstellungen
         local DefaultSettings = {
             Title = Properties.Title or "",
@@ -194,50 +194,42 @@ return {
             ImagePos = Properties.ImagePos or "left", -- Default position is "left"
             ContainerPosition = Properties.ContainerPosition or UDim2.new(1, -330, 1, -220)
         }
-        
+
         -- Überprüfen, ob UseAkaliBasic verwendet werden soll
         if Properties.UseAkaliBasic then
             -- AkaliBasic Benachrichtigung verwenden
             local Title = Properties.ATitle
             local Description = Properties.ADescription
             local Duration = Properties.ADuration or 5
-            
+
             if Title or Description then
                 local Y = Title and 26 or 0
                 if Description then
                     local TextSize = TextService:GetTextSize(Description, DescriptionSettings.Size, DescriptionSettings.Font, Vector2.new(0, 0))
-                    for i = 1, math.ceil(TextSize.X / (Container.AbsoluteSize.X - Padding - DescriptionPadding - 50)) do
+                    for i = 1, math.ceil(TextSize.X / (Container.AbsoluteSize.X - Padding - DescriptionPadding)) do
                         Y += TextSize.Y
                     end
                     Y += 8
                 end
+
                 local NewLabel = Round2px()
                 NewLabel.Size = UDim2.new(1, 0, 0, Y)
                 NewLabel.Position = UDim2.new(-1, 20, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
 
-                -- Standard-Icon verwenden
-                local IconSize = 40
-                local Icon = Image("rbxthumb://type=Asset&id=" .. DefaultSettings.ImageID)
-                Icon.Size = UDim2.new(0, IconSize, 0, IconSize)
-                Icon.Position = UDim2.new(0, 5, 0, 0)
-                Icon.Parent = NewLabel
-
-                -- Titel und Beschreibung hinzufügen
+                -- Bei AkaliBasic gibt es kein Icon
                 if Title then
-                    local TitleXPosition = UDim2.fromOffset(IconSize + 15, 0)
                     local NewTitle = TitleLabel(Title)
-                    NewTitle.Size = UDim2.new(1, -IconSize - 15, 0, 26)
-                    NewTitle.Position = TitleXPosition
+                    NewTitle.Size = UDim2.new(1, -15, 0, 26)
+                    NewTitle.Position = UDim2.fromOffset(10, 0)
                     NewTitle.Parent = NewLabel
                 end
 
                 if Description then
-                    local DescriptionXPosition = UDim2.fromOffset(IconSize + 15, Title and 26 or 0)
-                    local DescriptionWidth = UDim2.fromScale(1, 1) + UDim2.fromOffset(-DescriptionPadding - IconSize - 15, Title and -26 or 0)
+                    local DescriptionWidth = UDim2.fromScale(1, 1) + UDim2.fromOffset(-DescriptionPadding, Title and -26 or 0)
                     local NewDescription = DescriptionLabel(Description)
                     NewDescription.TextWrapped = true
                     NewDescription.Size = DescriptionWidth
-                    NewDescription.Position = DescriptionXPosition
+                    NewDescription.Position = UDim2.fromOffset(10, Title and 26 or 0)
                     NewDescription.TextYAlignment = Enum.TextYAlignment[Title and "Top" or "Center"]
                     NewDescription.Parent = NewLabel
                 end
@@ -259,7 +251,7 @@ return {
             local AutoImageScale = Properties.AutoImageScale
             local ImagePos = Properties.ImagePos or "left"
             local ContainerPosition = Properties.ContainerPosition or UDim2.new(1, -330, 1, -220)
-            
+
             -- Container neu erstellen, wenn Position angegeben wird
             Container:Destroy()
             Container = CreateContainer(ContainerPosition)
@@ -273,6 +265,7 @@ return {
                     end
                     Y += 8
                 end
+
                 local NewLabel = Round2px()
                 NewLabel.Size = UDim2.new(1, 0, 0, Y)
                 NewLabel.Position = UDim2.new(-1, 20, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
@@ -322,3 +315,4 @@ return {
         end
     end
 }
+
