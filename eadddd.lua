@@ -214,7 +214,7 @@ return {
             local Icon = Image(string.format("rbxthumb://type=Asset&id=%s&w=150&h=150", ImageID))
             local IconSize = AutoImageScale and UDim2.new(0, LabelHeight, 0, LabelHeight) or UDim2.new(0, 60, 0, 60) -- Adjust size based on AutoImageScale
             Icon.Size = IconSize
-            Icon.Position = UDim2.new(0, 20, 0, 0) -- Position the icon to the left
+            Icon.Position = UDim2.new(0, 2, 0, 0) -- Position the icon to the left
             Icon.Parent = NewLabel
 
             if Title then
