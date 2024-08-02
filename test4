@@ -195,29 +195,17 @@ return {
         local TitleTextSize = Properties.TitleTextSize or TitleSettings.Size
         local DescriptionTextSize = Properties.DescriptionTextSize or DescriptionSettings.Size
 
-        -- Define the maximum number of lines for description
-        local MaxLines = 4
-
         -- Optionally create a new container if position is provided
         Container:Destroy()
         Container = CreateContainer(ContainerPosition)
 
         if Title or Description then -- Check that user has provided title and/or description
-            local Y = Title and 26 or 0
-            local DescriptionHeight = 0
-
-            if Description then
-                local TextSize = TextService:GetTextSize(Description, DescriptionTextSize, DescriptionSettings.Font, Vector2.new(Container.AbsoluteSize.X - Padding - DescriptionPadding - (AutoImageScale and 50 or 40), math.huge))
-                local MaxDescriptionHeight = TextSize.Y * MaxLines
-                DescriptionHeight = math.min(TextSize.Y * math.ceil(TextSize.X / (Container.AbsoluteSize.X - Padding - DescriptionPadding - (AutoImageScale and 50 or 40))), MaxDescriptionHeight) + 8
-            end
-
-            local NewLabel = Round2px()
-            NewLabel.Size = UDim2.new(1, 0, 0, Y + DescriptionHeight)
-            NewLabel.Position = UDim2.new(-1, 20, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
+            local ContainerPadding = Padding + DescriptionPadding
+            local IconSize = AutoImageScale and 50 or 40
+            local ContentWidth = Container.AbsoluteSize.X - ContainerPadding - IconSize
+            local Y = 0
 
             -- Create and set up the icon
-            local IconSize = AutoImageScale and (Y + DescriptionHeight) or 40
             local Icon = Image(string.format("rbxthumb://type=Asset&id=%s&w=150&h=150", ImageID))
             Icon.Size = UDim2.new(0, IconSize, 0, IconSize) -- Make sure the icon is a square
             if ImagePos == "left" then
@@ -225,35 +213,37 @@ return {
             else
                 Icon.Position = UDim2.new(1, -IconSize - 5, 0, 0) -- Position it to the right
             end
-            Icon.Parent = NewLabel
+            Icon.Parent = Container
 
             -- Adjust Text position and size based on ImagePos
             if Title then
-                local TitleXOffset = ImagePos == "left" and IconSize + 15 or 0
-                local TitleWidth = ImagePos == "left" and UDim2.new(1, -IconSize - 15, 0, 26) or UDim2.new(1, -15, 0, 26)
-                local TitleXPosition = ImagePos == "left" and UDim2.fromOffset(IconSize + 15, 0) or UDim2.fromOffset(10, 0)
-                local NewTitle = TitleLabel(Title)
-                NewTitle.TextSize = TitleTextSize -- Apply custom text size
-                NewTitle.Size = TitleWidth
-                NewTitle.Position = TitleXPosition
-                NewTitle.Parent = NewLabel
+                local TitleLabel = TitleLabel(Title)
+                TitleLabel.TextSize = TitleTextSize -- Apply custom text size
+                TitleLabel.Size = UDim2.new(0, ContentWidth, 0, TitleTextSize + 10)
+                TitleLabel.Position = ImagePos == "left" and UDim2.fromOffset(IconSize + 15, 0) or UDim2.fromOffset(10, 0)
+                TitleLabel.Parent = Container
+                Y += TitleLabel.AbsoluteSize.Y
             end
 
             if Description then
-                local DescriptionXOffset = ImagePos == "left" and IconSize + 15 or 0
-                local DescriptionXPosition = ImagePos == "left" and UDim2.fromOffset(IconSize + 15, Title and 26 or 0) or UDim2.fromOffset(10, Title and 26 or 0)
-                local DescriptionWidth = ImagePos == "left" and UDim2.fromScale(1, 1) + UDim2.fromOffset(-DescriptionPadding, Title and -26 or 0) or UDim2.fromScale(1, 1) + UDim2.fromOffset(-DescriptionPadding - IconSize - 15, Title and -26 or 0)
-                local NewDescription = DescriptionLabel(Description)
-                NewDescription.TextSize = DescriptionTextSize -- Apply custom text size
-                NewDescription.TextWrapped = true
-                NewDescription.Size = DescriptionWidth
-                NewDescription.Position = DescriptionXPosition
-                NewDescription.TextYAlignment = Enum.TextYAlignment[Title and "Top" or "Center"]
-                NewDescription.Parent = NewLabel
+                local TextSize = TextService:GetTextSize(Description, DescriptionTextSize, DescriptionSettings.Font, Vector2.new(ContentWidth, math.huge))
+                local DescriptionLabel = DescriptionLabel(Description)
+                DescriptionLabel.TextSize = DescriptionTextSize -- Apply custom text size
+                DescriptionLabel.Size = UDim2.new(0, ContentWidth, 0, TextSize.Y)
+                DescriptionLabel.Position = ImagePos == "left" and UDim2.fromOffset(IconSize + 15, Y) or UDim2.fromOffset(10, Y)
+                DescriptionLabel.TextWrapped = true
+                DescriptionLabel.TextYAlignment = Enum.TextYAlignment.Top
+                DescriptionLabel.Parent = Container
+                Y += DescriptionLabel.AbsoluteSize.Y
             end
 
+            -- Adjust the container height based on the content size
+            local NewLabel = Round2px()
+            NewLabel.Size = UDim2.new(1, 0, 0, Y + (Padding * 2))
+            NewLabel.Position = UDim2.new(-1, 20, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
             Shadow2px().Parent = NewLabel
             NewLabel.Parent = Container
+
             table.insert(InstructionObjects, { NewLabel, 0, false })
             coroutine.wrap(function()
                 wait(Duration)
@@ -262,4 +252,3 @@ return {
         end
     end
 }
-
