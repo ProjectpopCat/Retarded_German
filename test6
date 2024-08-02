@@ -13,7 +13,7 @@ local function CreateContainer(Position)
     local Container = Instance.new("Frame")
     Container.Name = "Container"
     Container.Position = Position or UDim2.new(1, -330, 1, -220) -- Standardposition, wenn keine Position angegeben wird
-    Container.Size = UDim2.new(0, 300, 0.5, 0)
+    Container.Size = UDim2.new(0, 300, 0, 0) -- Anfangsgröße auf 0 setzen, wird später angepasst
     Container.BackgroundTransparency = 1
     Container.Parent = NotifGui
     return Container
@@ -58,7 +58,6 @@ local TweenDirection = Enum.EasingDirection.Out
 local LastTick = tick()
 
 local function CalculateBounds(TableOfObjects)
-    local TableOfObjects = typeof(TableOfObjects) == "table" and TableOfObjects or {}
     local X, Y = 0, 0
     for _, Object in next, TableOfObjects do
         X = math.max(X, Object.AbsoluteSize.X)
@@ -72,7 +71,7 @@ local CachedObjects = {}
 local function Update()
     local DeltaTime = tick() - LastTick
     local PreviousObjects = {}
-    for CurObj, Object in next, InstructionObjects do
+    for _, Object in next, InstructionObjects do
         local Label, Delta, Done = Object[1], Object[2], Object[3]
         if not Done then
             if Delta < TweenTime then
@@ -222,7 +221,7 @@ return {
                 TitleLabel.Size = UDim2.new(0, ContentWidth, 0, TitleTextSize + 10)
                 TitleLabel.Position = ImagePos == "left" and UDim2.fromOffset(IconSize + 15, Padding) or UDim2.fromOffset(10, Padding)
                 TitleLabel.Parent = Container
-                Y = Y + TitleLabel.AbsoluteSize.Y
+                Y = Y + TitleLabel.TextBounds.Y
             end
 
             if Description then
@@ -234,7 +233,7 @@ return {
                 DescriptionLabel.TextWrapped = true
                 DescriptionLabel.TextYAlignment = Enum.TextYAlignment.Top
                 DescriptionLabel.Parent = Container
-                Y = Y + DescriptionLabel.AbsoluteSize.Y + DescriptionPadding
+                Y = Y + DescriptionLabel.TextSize + DescriptionPadding
             end
 
             -- Adjust the container height based on the content size
