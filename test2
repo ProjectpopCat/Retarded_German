@@ -187,18 +187,19 @@ return {
         local Description = Properties.Description
         local Duration = Properties.Duration or 5
         local ImageID = Properties.ImageID or "17649496928" -- Default ImageID if none is provided
-        local AutoImageScale = Properties.AutoImageScale -- New field for automatic image scaling
-        local ContainerPosition = Properties.ContainerPosition -- New field for Container Position
+        local AutoImageScale = Properties.AutoImageScale
+        local ImagePos = Properties.ImagePos or "left" -- Default position is "left"
+        local ContainerPosition = Properties.ContainerPosition
 
         -- Optionally create a new container if position is provided
-        Container:Destroy() -- Remove the existing container if it exists
-        Container = CreateContainer(ContainerPosition) -- Create a new container with the provided position
+        Container:Destroy()
+        Container = CreateContainer(ContainerPosition)
 
         if Title or Description then -- Check that user has provided title and/or description
             local Y = Title and 26 or 0
             if Description then
                 local TextSize = TextService:GetTextSize(Description, DescriptionSettings.Size, DescriptionSettings.Font, Vector2.new(0, 0))
-                for i = 1, math.ceil(TextSize.X / (Container.AbsoluteSize.X - Padding - DescriptionPadding - 50)) do
+                for i = 1, math.ceil(TextSize.X / (Container.AbsoluteSize.X - Padding - DescriptionPadding - (AutoImageScale and 50 or 40))) do
                     Y += TextSize.Y
                 end
                 Y += 8
@@ -211,23 +212,36 @@ return {
             local IconSize = AutoImageScale and Y or 40
             local Icon = Image(string.format("rbxthumb://type=Asset&id=%s&w=150&h=150", ImageID))
             Icon.Size = UDim2.new(0, IconSize, 0, IconSize) -- Make sure the icon is a square
-            Icon.Position = UDim2.new(0, 5, 0, 0) -- Position it to the left
+            if ImagePos == "left" then
+                Icon.Position = UDim2.new(0, 5, 0, 0) -- Position it to the left
+            else
+                Icon.Position = UDim2.new(1, -IconSize - 5, 0, 0) -- Position it to the right
+            end
             Icon.Parent = NewLabel
 
+            -- Adjust Text position and size based on ImagePos
             if Title then
+                local TitleXOffset = ImagePos == "left" and IconSize + 15 or 0
+                local TitleWidth = ImagePos == "left" and UDim2.new(1, -IconSize - 15, 0, 26) or UDim2.new(1, -15, 0, 26)
+                local TitleXPosition = ImagePos == "left" and UDim2.fromOffset(IconSize + 15, 0) or UDim2.fromOffset(10, 0)
                 local NewTitle = TitleLabel(Title)
-                NewTitle.Size = UDim2.new(1, -IconSize - 15, 0, 26) -- Adjusted size for the title to make space for the icon
-                NewTitle.Position = UDim2.fromOffset(IconSize + 15, 0) -- Adjusted position to make space for the icon
+                NewTitle.Size = TitleWidth
+                NewTitle.Position = TitleXPosition
                 NewTitle.Parent = NewLabel
             end
+
             if Description then
+                local DescriptionXOffset = ImagePos == "left" and IconSize + 15 or 0
+                local DescriptionXPosition = ImagePos == "left" and UDim2.fromOffset(IconSize + 15, Title and 26 or 0) or UDim2.fromOffset(10, Title and 26 or 0)
+                local DescriptionWidth = ImagePos == "left" and UDim2.fromScale(1, 1) + UDim2.fromOffset(-DescriptionPadding, Title and -26 or 0) or UDim2.fromScale(1, 1) + UDim2.fromOffset(-DescriptionPadding - IconSize - 15, Title and -26 or 0)
                 local NewDescription = DescriptionLabel(Description)
                 NewDescription.TextWrapped = true
-                NewDescription.Size = UDim2.new(1, -IconSize - 15, 1, Title and -26 or 0) -- Adjusted size for the description to make space for the icon
-                NewDescription.Position = UDim2.fromOffset(IconSize + 15, Title and 26 or 0) -- Adjusted position to make space for the icon
+                NewDescription.Size = DescriptionWidth
+                NewDescription.Position = DescriptionXPosition
                 NewDescription.TextYAlignment = Enum.TextYAlignment[Title and "Top" or "Center"]
                 NewDescription.Parent = NewLabel
             end
+
             Shadow2px().Parent = NewLabel
             NewLabel.Parent = Container
             table.insert(InstructionObjects, { NewLabel, 0, false })
