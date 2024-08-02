@@ -4,13 +4,17 @@ local TextService = game:GetService("TextService")
 
 local Player = game:GetService("Players").LocalPlayer
 
+local NotifGui = Instance.new("ScreenGui")
+NotifGui.Name = "AkaliNotif"
+NotifGui.Parent = RunService:IsStudio() and Player.PlayerGui or game:GetService("CoreGui")
+
 local function CreateContainer(Position)
     local Container = Instance.new("Frame")
     Container.Name = "Container"
-    Container.Position = Position or UDim2.new(1, -330, 1, -220) -- Standardposition, wenn keine Position angegeben wird
-    Container.Size = UDim2.new(0, 300, 0, 50) -- Startgröße, wird später angepasst
+    Container.Position = Position or UDim2.new(1, -330, 1, -220) -- Default position if none is provided
+    Container.Size = UDim2.new(0, 300, 0, 100) -- Start with a default size
     Container.BackgroundTransparency = 1
-    Container.Parent = Player.PlayerGui
+    Container.Parent = NotifGui
     return Container
 end
 
@@ -204,16 +208,20 @@ return {
             end
 
             -- Calculate Title and Description positions
-            local TitleWidth = ImagePos == "left" and UDim2.new(1, -IconSize - 15, 0, 26) or UDim2.new(1, -IconSize - 15, 0, 26)
+            local TitleWidth = UDim2.new(1, -IconSize - 15, 0, 26)
             local TitleXPosition = ImagePos == "left" and UDim2.fromOffset(IconSize + 15, 0) or UDim2.fromOffset(10, 0)
             local DescriptionXOffset = ImagePos == "left" and IconSize + 15 or 0
-            local DescriptionWidth = ImagePos == "left" and UDim2.fromScale(1, 1) + UDim2.fromOffset(-DescriptionPadding - DescriptionXOffset, Title and -26 or 0) or UDim2.fromScale(1, 1) + UDim2.fromOffset(-DescriptionPadding - IconSize - 15, Title and -26 or 0)
+            local DescriptionWidth = UDim2.fromScale(1, 1) + UDim2.fromOffset(-DescriptionPadding - DescriptionXOffset, Title and -26 or 0)
             local DescriptionXPosition = ImagePos == "left" and UDim2.fromOffset(IconSize + 15, Title and 26 or 0) or UDim2.fromOffset(10, Title and 26 or 0)
 
             local NewLabel = Round2px()
-            NewLabel.Size = UDim2.new(0, math.max(300, IconSize + 20), 0, (Title and 26 or 0) + (Description and TextSize.Y + 8 or 0) + Padding)
+
+            -- Calculate the required size for the label
+            local LabelWidth = math.max(300, IconSize + 20)
+            local LabelHeight = (Title and 26 or 0) + (Description and TextSize.Y + 8 or 0) + Padding
+            NewLabel.Size = UDim2.new(0, LabelWidth, 0, LabelHeight)
             NewLabel.Position = UDim2.new(-1, 20, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
-            
+
             if Title then
                 local NewTitle = TitleLabel(Title)
                 NewTitle.Size = TitleWidth
