@@ -61,8 +61,8 @@ local function CalculateBounds(TableOfObjects)
     local TableOfObjects = typeof(TableOfObjects) == "table" and TableOfObjects or {}
     local X, Y = 0, 0
     for _, Object in next, TableOfObjects do
-        X += Object.AbsoluteSize.X
-        Y += Object.AbsoluteSize.Y
+        X = math.max(X, Object.AbsoluteSize.X)
+        Y = Y + Object.AbsoluteSize.Y
     end
     return { X = X, Y = Y, x = X, y = Y }
 end
@@ -203,7 +203,7 @@ return {
             local ContainerPadding = Padding + DescriptionPadding
             local IconSize = AutoImageScale and 50 or 40
             local ContentWidth = Container.AbsoluteSize.X - ContainerPadding - IconSize
-            local Y = 0
+            local Y = Padding
 
             -- Create and set up the icon
             local Icon = Image(string.format("rbxthumb://type=Asset&id=%s&w=150&h=150", ImageID))
@@ -220,9 +220,9 @@ return {
                 local TitleLabel = TitleLabel(Title)
                 TitleLabel.TextSize = TitleTextSize -- Apply custom text size
                 TitleLabel.Size = UDim2.new(0, ContentWidth, 0, TitleTextSize + 10)
-                TitleLabel.Position = ImagePos == "left" and UDim2.fromOffset(IconSize + 15, 0) or UDim2.fromOffset(10, 0)
+                TitleLabel.Position = ImagePos == "left" and UDim2.fromOffset(IconSize + 15, Padding) or UDim2.fromOffset(10, Padding)
                 TitleLabel.Parent = Container
-                Y += TitleLabel.AbsoluteSize.Y
+                Y = Y + TitleLabel.AbsoluteSize.Y
             end
 
             if Description then
@@ -234,13 +234,13 @@ return {
                 DescriptionLabel.TextWrapped = true
                 DescriptionLabel.TextYAlignment = Enum.TextYAlignment.Top
                 DescriptionLabel.Parent = Container
-                Y += DescriptionLabel.AbsoluteSize.Y
+                Y = Y + DescriptionLabel.AbsoluteSize.Y + DescriptionPadding
             end
 
             -- Adjust the container height based on the content size
             local NewLabel = Round2px()
-            NewLabel.Size = UDim2.new(1, 0, 0, Y + (Padding * 2))
-            NewLabel.Position = UDim2.new(-1, 20, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
+            NewLabel.Size = UDim2.new(1, 0, 0, Y)
+            NewLabel.Position = UDim2.new(0, 0, 0, 0)
             Shadow2px().Parent = NewLabel
             NewLabel.Parent = Container
 
