@@ -207,7 +207,7 @@ return {
             end
             local NewLabel = Round2px()
             local LabelHeight = math.max(Y, 60) -- Ensure label height is at least 60 to accommodate the icon
-            NewLabel.Size = UDim2.new(5, 0, 0, LabelHeight)
+            NewLabel.Size = UDim2.new(1, 0, 0, LabelHeight)
             NewLabel.Position = UDim2.new(-1, 20, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
 
             -- Create and set up the icon
@@ -219,15 +219,15 @@ return {
 
             if Title then
                 local NewTitle = TitleLabel(Title)
-                NewTitle.Size = UDim2.new(1, -130, 0, 26) -- Adjusted size for the title to make space for the icon
+                NewTitle.Size = UDim2.new(1, -130, 0, 44) -- Adjusted size for the title to make space for the icon
                 NewTitle.Position = UDim2.fromOffset(70, 0) -- Adjusted position to make space for the icon
                 NewTitle.Parent = NewLabel
             end
             if Description then
                 local NewDescription = DescriptionLabel(Description)
                 NewDescription.TextWrapped = true
-                NewDescription.Size = UDim2.new(1, -130, 1, Title and -26 or 0) -- Adjusted size for the description to make space for the icon
-                NewDescription.Position = UDim2.fromOffset(70, Title and 26 or 0) -- Adjusted position to make space for the icon
+                NewDescription.Size = UDim2.new(1, -130, 1, Title and -44 or 0) -- Adjusted size for the description to make space for the icon
+                NewDescription.Position = UDim2.fromOffset(130, Title and 44 or 0) -- Adjusted position to make space for the icon
                 NewDescription.TextYAlignment = Enum.TextYAlignment[Title and "Top" or "Center"]
                 NewDescription.Parent = NewLabel
             end
