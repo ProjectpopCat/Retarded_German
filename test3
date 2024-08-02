@@ -180,6 +180,30 @@ local function FadeOutAfter(Object, Seconds)
     ResetObjects()
 end
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 return {
     Notify = function(Properties)
         local Properties = typeof(Properties) == "table" and Properties or {}
@@ -201,6 +225,11 @@ return {
             local Title = Properties.ATitle
             local Description = Properties.ADescription
             local Duration = Properties.ADuration or 5
+            local ContainerPosition = Properties.AContainerPosition or DefaultSettings.ContainerPosition
+
+            -- Container neu erstellen, wenn Position angegeben wird
+            Container:Destroy()
+            Container = CreateContainer(ContainerPosition)
 
             if Title or Description then
                 local Y = Title and 26 or 0
@@ -248,7 +277,7 @@ return {
             local Description = Properties.Description
             local Duration = Properties.Duration or 5
             local ImageID = Properties.ImageID or "17649496928"
-            local AutoImageScale = Properties.AutoImageScale
+            local AutoImageScale = Properties.AutoImageScale or false
             local ImagePos = Properties.ImagePos or "left"
             local ContainerPosition = Properties.ContainerPosition or UDim2.new(1, -330, 1, -220)
 
@@ -315,4 +344,3 @@ return {
         end
     end
 }
-
