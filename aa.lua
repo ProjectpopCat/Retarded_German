@@ -214,8 +214,8 @@ return {
 
             -- Create the notification label
             local NewLabel = Round2px()
-            NewLabel.Size = UDim2.new(0, IconSize + 50 + MaxWidth, 0, Y) -- Size adjusted to include the icon
-            NewLabel.Position = UDim2.new(-1, -20, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
+            NewLabel.Size = UDim2.new(0, IconSize + 10 + MaxWidth, 0, Y) -- Size adjusted to include the icon
+            NewLabel.Position = UDim2.new(-1, 10, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
             Icon.Parent = NewLabel
 
             if Title then
