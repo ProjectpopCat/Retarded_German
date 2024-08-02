@@ -85,7 +85,7 @@ local function Update()
         local NewValue = TweenService:GetValue(Delta, TweenStyle, TweenDirection)
         local CurrentPos = Label.Position
         local PreviousBounds = CalculateBounds(PreviousObjects)
-        local TargetPos = Udim2.new(0, 0, 0, PreviousBounds.Y + (Padding * #PreviousObjects))
+        local TargetPos = UDim2.new(0, 0, 0, PreviousBounds.Y + (Padding * #PreviousObjects))
         Label.Position = CurrentPos:Lerp(TargetPos, NewValue)
         table.insert(PreviousObjects, Label)
     end
@@ -206,14 +206,14 @@ return {
                 Y += 8
             end
             local NewLabel = Round2px()
-            NewLabel.Size = UDim2.new(1, 0, 0, Y)
+            NewLabel.Size = UDim2.new(1, 0, 0, Y + 50) -- Adjust height to include icon space
             NewLabel.Position = UDim2.new(-1, 20, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
 
             -- Create and set up the icon
             local Icon = Image(string.format("rbxthumb://type=Asset&id=%s&w=150&h=150", ImageID))
             local IconSize = AutoImageScale and UDim2.new(0, Y, 0, Y) or UDim2.new(0, 40, 0, 40) -- Adjust size based on AutoImageScale
             Icon.Size = IconSize
-            Icon.Position = UDim2.new(0, 5, 0, AutoImageScale and 0 or (Y - 40) / 2) -- Adjust position based on AutoImageScale
+            Icon.Position = UDim2.new(0, 5, 0, AutoImageScale and 5 or (Y - 40) / 2) -- Adjust position based on AutoImageScale
             Icon.Parent = NewLabel
 
             if Title then
