@@ -8,7 +8,6 @@ local NotifGui = Instance.new("ScreenGui")
 NotifGui.Name = "AkaliNotif"
 NotifGui.Parent = RunService:IsStudio() and Player.PlayerGui or game:GetService("CoreGui")
 
--- Funktion zum Erstellen und Positionieren des Containers
 local function CreateContainer(Position)
     local Container = Instance.new("Frame")
     Container.Name = "Container"
@@ -189,31 +188,36 @@ return {
         local ImageID = Properties.ImageID or "17649496928" -- Default ImageID if none is provided
         local AutoImageScale = Properties.AutoImageScale
         local ImagePos = Properties.ImagePos or "left" -- Default position is "left"
-        local ContainerPosition = Properties.ContainerPosition
+        local ContainerPosition = Properties.ContainerPosition or UDim2.new(1, -330, 1, -220)
 
         -- Optionally create a new container if position is provided
         Container:Destroy()
         Container = CreateContainer(ContainerPosition)
 
         if Title or Description then -- Check that user has provided title and/or description
-            -- Create and set up the icon
-            local IconSize = AutoImageScale and (Title and 26 or 0) + (Description and TextService:GetTextSize(Description, DescriptionSettings.Size, DescriptionSettings.Font, Vector2.new(0, 0)).Y + 8 or 0) or 40
+            local TextSize = Description and TextService:GetTextSize(Description, DescriptionSettings.Size, DescriptionSettings.Font, Vector2.new(0, 0)) or Vector2.new(0, 0)
+            local IconSize = AutoImageScale and (Title and 26 or 0) + (Description and TextSize.Y + 8 or 0) or 40
             local Icon = Image(string.format("rbxthumb://type=Asset&id=%s&w=150&h=150", ImageID))
-            Icon.Size = UDim2.new(0, IconSize, 0, IconSize) -- Make sure the icon is a square
+            Icon.Size = UDim2.new(0, IconSize, 0, IconSize) -- Ensure the icon is a square
+
+            -- Adjust Image Position
             if ImagePos == "left" then
-                Icon.Position = UDim2.new(0, 5, 0, 0) -- Position it to the left
+                Icon.Position = UDim2.new(0, 5, 0, 0)
             else
-                Icon.Position = UDim2.new(1, -IconSize - 5, 0, 0) -- Position it to the right
+                Icon.Position = UDim2.new(1, -IconSize - 5, 0, 0)
             end
 
-            -- Adjust Text position and size based on ImagePos
-            local TitleWidth = UDim2.new(1, -IconSize - (ImagePos == "left" and 15 or 0), 0, 26)
+            -- Calculate Title and Description positions
+            local TitleWidth = UDim2.new(1, -IconSize - 15, 0, 26)
             local TitleXPosition = ImagePos == "left" and UDim2.fromOffset(IconSize + 15, 0) or UDim2.fromOffset(10, 0)
-            local NewLabel = Round2px()
-            NewLabel.Size = UDim2.new(0, math.max(300, IconSize + 20), 0, (Title and 26 or 0) + (Description and TextService:GetTextSize(Description, DescriptionSettings.Size, DescriptionSettings.Font, Vector2.new(0, 0)).Y + 8 or 0))
-            NewLabel.Position = UDim2.new(-1, 20, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
-            NewLabel.Parent = Container
+            local DescriptionXOffset = ImagePos == "left" and IconSize + 15 or 0
+            local DescriptionWidth = UDim2.fromScale(1, 1) + UDim2.fromOffset(-DescriptionPadding - DescriptionXOffset, Title and -26 or 0)
+            local DescriptionXPosition = ImagePos == "left" and UDim2.fromOffset(IconSize + 15, Title and 26 or 0) or UDim2.fromOffset(10, Title and 26 or 0)
 
+            local NewLabel = Round2px()
+            NewLabel.Size = UDim2.new(0, math.max(300, IconSize + 20), 0, (Title and 26 or 0) + (Description and TextSize.Y + 8 or 0) + Padding)
+            NewLabel.Position = UDim2.new(-1, 20, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
+            
             if Title then
                 local NewTitle = TitleLabel(Title)
                 NewTitle.Size = TitleWidth
@@ -222,9 +226,6 @@ return {
             end
 
             if Description then
-                local DescriptionXOffset = ImagePos == "left" and IconSize + 15 or 0
-                local DescriptionXPosition = ImagePos == "left" and UDim2.fromOffset(IconSize + 15, Title and 26 or 0) or UDim2.fromOffset(10, Title and 26 or 0)
-                local DescriptionWidth = ImagePos == "left" and UDim2.fromScale(1, 1) + UDim2.fromOffset(-DescriptionPadding, Title and -26 or 0) or UDim2.fromScale(1, 1) + UDim2.fromOffset(-DescriptionPadding - IconSize - 15, Title and -26 or 0)
                 local NewDescription = DescriptionLabel(Description)
                 NewDescription.TextWrapped = true
                 NewDescription.Size = DescriptionWidth
@@ -235,6 +236,7 @@ return {
 
             Icon.Parent = NewLabel
             Shadow2px().Parent = NewLabel
+            NewLabel.Parent = Container
             table.insert(InstructionObjects, { NewLabel, 0, false })
             coroutine.wrap(function()
                 wait(Duration)
