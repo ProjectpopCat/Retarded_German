@@ -6,13 +6,13 @@ local Player = game:GetService("Players").LocalPlayer
 
 local NotifGui = Instance.new("ScreenGui")
 NotifGui.Name = "AkaliNotif"
-NotifGui.Parent = RunService:IsStudio() and Player.PlayerGui or game:GetService("CoreGui")
+NotifGui.Parent = Player:FindFirstChildOfClass("PlayerGui") or game:GetService("CoreGui")
 
 -- Funktion zum Erstellen und Positionieren des Containers
 local function CreateContainer(Position)
     local Container = Instance.new("Frame")
     Container.Name = "Container"
-    Container.Position = Position or UDim2.new(1, -330, 1, -220) -- Standardposition, wenn keine Position angegeben wird
+    Container.Position = Position or UDim2.new(1, -330, 1, -220) -- Standardposition
     Container.Size = UDim2.new(0, 300, 0, 0) -- Anfangsgröße auf 0 setzen, wird später angepasst
     Container.BackgroundTransparency = 1
     Container.Parent = NotifGui
@@ -50,7 +50,6 @@ end
 
 local Padding = 10
 local DescriptionPadding = 10
-local InstructionObjects = {}
 local TweenTime = 1
 local TweenStyle = Enum.EasingStyle.Sine
 local TweenDirection = Enum.EasingDirection.Out
@@ -181,11 +180,10 @@ end
 
 return {
     Notify = function(Properties)
-        local Properties = typeof(Properties) == "table" and Properties or {}
         local Title = Properties.Title
         local Description = Properties.Description
         local Duration = Properties.Duration or 5
-        local ImageID = Properties.ImageID or "17649496928" -- Default ImageID if none is provided
+        local ImageID = Properties.ImageID or "17649496928" -- Default ImageID
         local AutoImageScale = Properties.AutoImageScale
         local ImagePos = Properties.ImagePos or "left" -- Default position is "left"
         local ContainerPosition = Properties.ContainerPosition
@@ -198,7 +196,7 @@ return {
         Container:Destroy()
         Container = CreateContainer(ContainerPosition)
 
-        if Title or Description then -- Check that user has provided title and/or description
+        if Title or Description then
             local ContainerPadding = Padding + DescriptionPadding
             local IconSize = AutoImageScale and 50 or 40
             local ContentWidth = Container.AbsoluteSize.X - ContainerPadding - IconSize
@@ -206,39 +204,39 @@ return {
 
             -- Create and set up the icon
             local Icon = Image(string.format("rbxthumb://type=Asset&id=%s&w=150&h=150", ImageID))
-            Icon.Size = UDim2.new(0, IconSize, 0, IconSize) -- Make sure the icon is a square
+            Icon.Size = UDim2.new(0, IconSize, 0, IconSize)
             if ImagePos == "left" then
-                Icon.Position = UDim2.new(0, 5, 0, 0) -- Position it to the left
+                Icon.Position = UDim2.new(0, 5, 0, 0)
             else
-                Icon.Position = UDim2.new(1, -IconSize - 5, 0, 0) -- Position it to the right
+                Icon.Position = UDim2.new(1, -IconSize - 5, 0, 0)
             end
             Icon.Parent = Container
 
             -- Adjust Text position and size based on ImagePos
             if Title then
                 local TitleLabel = TitleLabel(Title)
-                TitleLabel.TextSize = TitleTextSize -- Apply custom text size
+                TitleLabel.TextSize = TitleTextSize
                 TitleLabel.Size = UDim2.new(0, ContentWidth, 0, TitleTextSize + 10)
                 TitleLabel.Position = ImagePos == "left" and UDim2.fromOffset(IconSize + 15, Padding) or UDim2.fromOffset(10, Padding)
                 TitleLabel.Parent = Container
-                Y = Y + TitleLabel.TextBounds.Y
+                Y = Y + TitleLabel.TextSize + 10
             end
 
             if Description then
                 local TextSize = TextService:GetTextSize(Description, DescriptionTextSize, DescriptionSettings.Font, Vector2.new(ContentWidth, math.huge))
                 local DescriptionLabel = DescriptionLabel(Description)
-                DescriptionLabel.TextSize = DescriptionTextSize -- Apply custom text size
+                DescriptionLabel.TextSize = DescriptionTextSize
                 DescriptionLabel.Size = UDim2.new(0, ContentWidth, 0, TextSize.Y)
                 DescriptionLabel.Position = ImagePos == "left" and UDim2.fromOffset(IconSize + 15, Y) or UDim2.fromOffset(10, Y)
                 DescriptionLabel.TextWrapped = true
                 DescriptionLabel.TextYAlignment = Enum.TextYAlignment.Top
                 DescriptionLabel.Parent = Container
-                Y = Y + DescriptionLabel.TextSize + DescriptionPadding
+                Y = Y + TextSize.Y + DescriptionPadding
             end
 
             -- Adjust the container height based on the content size
             local NewLabel = Round2px()
-            NewLabel.Size = UDim2.new(1, 0, 0, Y)
+            NewLabel.Size = UDim2.new(1, 0, 0, Y + Padding)
             NewLabel.Position = UDim2.new(0, 0, 0, 0)
             Shadow2px().Parent = NewLabel
             NewLabel.Parent = Container
