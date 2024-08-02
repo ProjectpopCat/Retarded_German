@@ -190,7 +190,7 @@ return {
         local Duration = Properties.Duration or 5
         local ImageID = Properties.ImageID or "17649496928" -- Default ImageID if none is provided
         local AutoImageScale = Properties.AutoImageScale -- New field for automatic image scaling
-        local ImagePos = Properties.ImagePos or UDim2.new(0, 5, 0, 0) -- Default position for icon
+        local ImagePos = Properties.ImagePos or UDim2.new(0, 5, 0, 5) -- Default position for icon
         local ContainerPosition = Properties.ContainerPosition -- New field for Container Position
 
         -- Optionally create a new container if position is provided
@@ -228,7 +228,7 @@ return {
             if Description then
                 local NewDescription = DescriptionLabel(Description)
                 NewDescription.TextWrapped = true
-                NewDescription.Size = UDim2.fromScale(1, 1) + UDim2.fromOffset(-DescriptionPadding, Title and -26 or 0)
+                NewDescription.Size = UDim2.fromScale(1, 1) + UDim2.fromOffset(-DescriptionPadding - IconSize, Title and -26 or 0) -- Adjusted size to account for the icon
                 NewDescription.Position = UDim2.fromOffset(70, Title and 26 or 0) -- Adjusted position to make space for the icon
                 NewDescription.TextYAlignment = Enum.TextYAlignment[Title and "Top" or "Center"]
                 NewDescription.Parent = NewLabel
