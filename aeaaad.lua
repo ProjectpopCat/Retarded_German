@@ -214,19 +214,19 @@ return {
             local Icon = Image(string.format("rbxthumb://type=Asset&id=%s&w=150&h=150", ImageID))
             local IconSize = AutoImageScale and UDim2.new(0, LabelHeight, 0, LabelHeight) or UDim2.new(0, 60, 0, 60) -- Adjust size based on AutoImageScale
             Icon.Size = IconSize
-            Icon.Position = UDim2.new(0, -10, 0, 0) -- Ändere den Offset hier, um das Bild weiter nach links zu verschieben
+            Icon.Position = UDim2.new(0, 0, 0, 0) -- Ändere den Offset hier, um das Bild weiter nach links zu verschieben
             Icon.Parent = NewLabel
 
             if Title then
                 local NewTitle = TitleLabel(Title)
-                NewTitle.Size = UDim2.new(1, -70, 0, 26) -- Adjusted size for the title to make space for the icon
+                NewTitle.Size = UDim2.new(1, -100, 0, 26) -- Adjusted size for the title to make space for the icon
                 NewTitle.Position = UDim2.fromOffset(70, 0) -- Adjusted position to make space for the icon
                 NewTitle.Parent = NewLabel
             end
             if Description then
                 local NewDescription = DescriptionLabel(Description)
                 NewDescription.TextWrapped = true
-                NewDescription.Size = UDim2.new(1, -70, 1, Title and -26 or 0) -- Adjusted size for the description to make space for the icon
+                NewDescription.Size = UDim2.new(1, -100, 1, Title and -26 or 0) -- Adjusted size for the description to make space for the icon
                 NewDescription.Position = UDim2.fromOffset(70, Title and 26 or 0) -- Adjusted position to make space for the icon
                 NewDescription.TextYAlignment = Enum.TextYAlignment[Title and "Top" or "Center"]
                 NewDescription.Parent = NewLabel
