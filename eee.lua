@@ -190,6 +190,7 @@ return {
         local Duration = Properties.Duration or 5
         local ImageID = Properties.ImageID or "17649496928" -- Default ImageID if none is provided
         local AutoImageScale = Properties.AutoImageScale -- New field for automatic image scaling
+        local ImagePos = Properties.ImagePos or UDim2.new(0, 5, 0, 0) -- Default position for icon
         local ContainerPosition = Properties.ContainerPosition -- New field for Container Position
 
         -- Optionally create a new container if position is provided
@@ -210,12 +211,12 @@ return {
             local IconSize = AutoImageScale and Y or 60 -- Adjust size based on AutoImageScale
             local Icon = Image(string.format("rbxthumb://type=Asset&id=%s&w=150&h=150", ImageID))
             Icon.Size = UDim2.new(0, IconSize, 0, IconSize)
-            Icon.Position = UDim2.new(0, 20, 0, 0) -- Position the icon to the left
+            Icon.Position = ImagePos -- Position the icon as specified
 
             -- Create the notification label
             local NewLabel = Round2px()
-            NewLabel.Size = UDim2.new(0, IconSize + 10 + MaxWidth, 0, Y) -- Size adjusted to include the icon
-            NewLabel.Position = UDim2.new(-1, 10, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
+            NewLabel.Size = UDim2.new(0, IconSize + 50 + MaxWidth, 0, Y) -- Size adjusted to include the icon
+            NewLabel.Position = UDim2.new(-1, 20, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
             Icon.Parent = NewLabel
 
             if Title then
