@@ -195,25 +195,29 @@ return {
         local TitleTextSize = Properties.TitleTextSize or TitleSettings.Size
         local DescriptionTextSize = Properties.DescriptionTextSize or DescriptionSettings.Size
 
+        -- Define the maximum number of lines for description
+        local MaxLines = 4
+
         -- Optionally create a new container if position is provided
         Container:Destroy()
         Container = CreateContainer(ContainerPosition)
 
         if Title or Description then -- Check that user has provided title and/or description
             local Y = Title and 26 or 0
+            local DescriptionHeight = 0
+
             if Description then
-                local TextSize = TextService:GetTextSize(Description, DescriptionTextSize, DescriptionSettings.Font, Vector2.new(0, 0))
-                for i = 1, math.ceil(TextSize.X / (Container.AbsoluteSize.X - Padding - DescriptionPadding - (AutoImageScale and 50 or 40))) do
-                    Y += TextSize.Y
-                end
-                Y += 8
+                local TextSize = TextService:GetTextSize(Description, DescriptionTextSize, DescriptionSettings.Font, Vector2.new(Container.AbsoluteSize.X - Padding - DescriptionPadding - (AutoImageScale and 50 or 40), math.huge))
+                local MaxDescriptionHeight = TextSize.Y * MaxLines
+                DescriptionHeight = math.min(TextSize.Y * math.ceil(TextSize.X / (Container.AbsoluteSize.X - Padding - DescriptionPadding - (AutoImageScale and 50 or 40))), MaxDescriptionHeight) + 8
             end
+
             local NewLabel = Round2px()
-            NewLabel.Size = UDim2.new(1, 0, 0, Y)
+            NewLabel.Size = UDim2.new(1, 0, 0, Y + DescriptionHeight)
             NewLabel.Position = UDim2.new(-1, 20, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
 
             -- Create and set up the icon
-            local IconSize = AutoImageScale and Y or 40
+            local IconSize = AutoImageScale and (Y + DescriptionHeight) or 40
             local Icon = Image(string.format("rbxthumb://type=Asset&id=%s&w=150&h=150", ImageID))
             Icon.Size = UDim2.new(0, IconSize, 0, IconSize) -- Make sure the icon is a square
             if ImagePos == "left" then
@@ -258,3 +262,4 @@ return {
         end
     end
 }
+
