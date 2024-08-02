@@ -8,11 +8,12 @@ local NotifGui = Instance.new("ScreenGui")
 NotifGui.Name = "AkaliNotif"
 NotifGui.Parent = RunService:IsStudio() and Player.PlayerGui or game:GetService("CoreGui")
 
+-- Funktion zum Erstellen und Positionieren des Containers
 local function CreateContainer(Position)
     local Container = Instance.new("Frame")
     Container.Name = "Container"
     Container.Position = Position or UDim2.new(1, -330, 1, -220) -- Standardposition, wenn keine Position angegeben wird
-    Container.Size = UDim2.new(0, 300, 0, 100) -- Startgröße
+    Container.Size = UDim2.new(0, 300, 0.5, 0)
     Container.BackgroundTransparency = 1
     Container.Parent = NotifGui
     return Container
@@ -60,8 +61,8 @@ local function CalculateBounds(TableOfObjects)
     local TableOfObjects = typeof(TableOfObjects) == "table" and TableOfObjects or {}
     local X, Y = 0, 0
     for _, Object in next, TableOfObjects do
-        X = math.max(X, Object.AbsoluteSize.X)
-        Y = Y + Object.AbsoluteSize.Y
+        X += Object.AbsoluteSize.X
+        Y += Object.AbsoluteSize.Y
     end
     return { X = X, Y = Y, x = X, y = Y }
 end
@@ -195,27 +196,8 @@ return {
         Container = CreateContainer(ContainerPosition)
 
         if Title or Description then -- Check that user has provided title and/or description
-            -- Calculate sizes
-            local TitleHeight = Title and 26 or 0
-            local DescriptionSize = Vector2.new(0, 0)
-
-            if Description then
-                local TextSize = TextService:GetTextSize(Description, DescriptionSettings.Size, DescriptionSettings.Font, Vector2.new(0, 0))
-                DescriptionSize = Vector2.new(TextSize.X, TextSize.Y)
-            end
-
-            local IconSize = AutoImageScale and (TitleHeight + DescriptionSize.Y + 20) or 40
-            local IconPadding = 15
-
-            local MaxWidth = Container.AbsoluteSize.X - Padding - DescriptionPadding - IconPadding - IconSize
-            local NewHeight = math.max(TitleHeight + DescriptionSize.Y + Padding * 2, IconSize)
-            local NewWidth = MaxWidth + IconSize + IconPadding
-
-            local NewLabel = Round2px()
-            NewLabel.Size = UDim2.new(0, NewWidth, 0, NewHeight)
-            NewLabel.Position = UDim2.new(-1, 20, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
-
             -- Create and set up the icon
+            local IconSize = AutoImageScale and (Title and 26 or 0) + (Description and TextService:GetTextSize(Description, DescriptionSettings.Size, DescriptionSettings.Font, Vector2.new(0, 0)).Y + 8 or 0) or 40
             local Icon = Image(string.format("rbxthumb://type=Asset&id=%s&w=150&h=150", ImageID))
             Icon.Size = UDim2.new(0, IconSize, 0, IconSize) -- Make sure the icon is a square
             if ImagePos == "left" then
@@ -223,13 +205,16 @@ return {
             else
                 Icon.Position = UDim2.new(1, -IconSize - 5, 0, 0) -- Position it to the right
             end
-            Icon.Parent = NewLabel
 
             -- Adjust Text position and size based on ImagePos
+            local TitleWidth = UDim2.new(1, -IconSize - (ImagePos == "left" and 15 or 0), 0, 26)
+            local TitleXPosition = ImagePos == "left" and UDim2.fromOffset(IconSize + 15, 0) or UDim2.fromOffset(10, 0)
+            local NewLabel = Round2px()
+            NewLabel.Size = UDim2.new(0, math.max(300, IconSize + 20), 0, (Title and 26 or 0) + (Description and TextService:GetTextSize(Description, DescriptionSettings.Size, DescriptionSettings.Font, Vector2.new(0, 0)).Y + 8 or 0))
+            NewLabel.Position = UDim2.new(-1, 20, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
+            NewLabel.Parent = Container
+
             if Title then
-                local TitleXOffset = ImagePos == "left" and IconSize + IconPadding or 0
-                local TitleWidth = UDim2.fromScale(1, 0)
-                local TitleXPosition = ImagePos == "left" and UDim2.fromOffset(TitleXOffset, 0) or UDim2.fromOffset(10, 0)
                 local NewTitle = TitleLabel(Title)
                 NewTitle.Size = TitleWidth
                 NewTitle.Position = TitleXPosition
@@ -237,9 +222,9 @@ return {
             end
 
             if Description then
-                local DescriptionXOffset = ImagePos == "left" and IconSize + IconPadding or 0
-                local DescriptionWidth = UDim2.fromScale(1, 1) + UDim2.fromOffset(-DescriptionPadding - DescriptionSize.X - DescriptionXOffset, Title and -TitleHeight or 0)
-                local DescriptionXPosition = ImagePos == "left" and UDim2.fromOffset(IconSize + IconPadding, Title and 26 or 0) or UDim2.fromOffset(10, Title and 26 or 0)
+                local DescriptionXOffset = ImagePos == "left" and IconSize + 15 or 0
+                local DescriptionXPosition = ImagePos == "left" and UDim2.fromOffset(IconSize + 15, Title and 26 or 0) or UDim2.fromOffset(10, Title and 26 or 0)
+                local DescriptionWidth = ImagePos == "left" and UDim2.fromScale(1, 1) + UDim2.fromOffset(-DescriptionPadding, Title and -26 or 0) or UDim2.fromScale(1, 1) + UDim2.fromOffset(-DescriptionPadding - IconSize - 15, Title and -26 or 0)
                 local NewDescription = DescriptionLabel(Description)
                 NewDescription.TextWrapped = true
                 NewDescription.Size = DescriptionWidth
@@ -248,9 +233,9 @@ return {
                 NewDescription.Parent = NewLabel
             end
 
+            Icon.Parent = NewLabel
             Shadow2px().Parent = NewLabel
-            NewLabel.Parent = Container
-            table.insert(InstructionObjects, {NewLabel, 0, false})
+            table.insert(InstructionObjects, { NewLabel, 0, false })
             coroutine.wrap(function()
                 wait(Duration)
                 FadeOutAfter(NewLabel, 0.25)
