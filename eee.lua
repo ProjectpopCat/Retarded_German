@@ -13,7 +13,7 @@ local function CreateContainer(Position)
     local Container = Instance.new("Frame")
     Container.Name = "Container"
     Container.Position = Position or UDim2.new(1, -330, 1, -220) -- Standardposition, wenn keine Position angegeben wird
-    Container.Size = UDim2.new(0, 300, 0.5, 0) -- Anfangsgröße des Containers
+    Container.Size = UDim2.new(0, 300, 0.5, 0)
     Container.BackgroundTransparency = 1
     Container.Parent = NotifGui
     return Container
@@ -105,6 +105,8 @@ local DescriptionSettings = {
     Size = 14
 }
 
+local MaxWidth = (Container.AbsoluteSize.X - Padding - DescriptionPadding - 60) -- Adjusted for the icon width
+
 local function Label(Text, Font, Size, Button)
     local Label = Instance.new(string.format("Text%s", Button and "Button" or "Label"))
     Label.Text = Text
@@ -195,26 +197,24 @@ return {
         Container = CreateContainer(ContainerPosition) -- Create a new container with the provided position
 
         if Title or Description then -- Check that user has provided title and/or description
-            local DescriptionWidth = MaxWidth
-            local LabelHeight = 0
-            local IconSize = 60 -- Default icon size
-            
+            local Y = Title and 26 or 0
             if Description then
                 local TextSize = TextService:GetTextSize(Description, DescriptionSettings.Size, DescriptionSettings.Font, Vector2.new(0, 0))
-                local Lines = math.ceil(TextSize.X / DescriptionWidth)
-                LabelHeight = TextSize.Y * Lines + 8
-                DescriptionWidth = DescriptionWidth + IconSize -- Adjust the description width for the icon
+                for i = 1, math.ceil(TextSize.X / MaxWidth) do
+                    Y += TextSize.Y
+                end
+                Y += 8
             end
-            
             local NewLabel = Round2px()
-            NewLabel.Size = UDim2.new(0, DescriptionWidth, 0, LabelHeight)
-            NewLabel.Position = UDim2.new(0, 70, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
+            local LabelHeight = math.max(Y, 60) -- Ensure label height is at least 60 to accommodate the icon
+            NewLabel.Size = UDim2.new(1, 0, 0, LabelHeight)
+            NewLabel.Position = UDim2.new(-1, 20, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
 
             -- Create and set up the icon
             local Icon = Image(string.format("rbxthumb://type=Asset&id=%s&w=150&h=150", ImageID))
             local IconSize = AutoImageScale and UDim2.new(0, LabelHeight, 0, LabelHeight) or UDim2.new(0, 60, 0, 60) -- Adjust size based on AutoImageScale
             Icon.Size = IconSize
-            Icon.Position = UDim2.new(0, 0, 0, 0) -- Position the icon on the left
+            Icon.Position = UDim2.new(0, 5, 0, 0) -- Position the icon to the left
             Icon.Parent = NewLabel
 
             if Title then
@@ -223,16 +223,14 @@ return {
                 NewTitle.Position = UDim2.fromOffset(70, 0) -- Adjusted position to make space for the icon
                 NewTitle.Parent = NewLabel
             end
-
             if Description then
                 local NewDescription = DescriptionLabel(Description)
                 NewDescription.TextWrapped = true
-                NewDescription.Size = UDim2.fromScale(1, 1) + UDim2.fromOffset(-DescriptionPadding, Title and -26 or 0) -- Adjusted size for the description to make space for the icon
+                NewDescription.Size = UDim2.new(1, -70, 1, Title and -26 or 0) -- Adjusted size for the description to make space for the icon
                 NewDescription.Position = UDim2.fromOffset(70, Title and 26 or 0) -- Adjusted position to make space for the icon
                 NewDescription.TextYAlignment = Enum.TextYAlignment[Title and "Top" or "Center"]
                 NewDescription.Parent = NewLabel
             end
-
             Shadow2px().Parent = NewLabel
             NewLabel.Parent = Container
             table.insert(InstructionObjects, { NewLabel, 0, false })
