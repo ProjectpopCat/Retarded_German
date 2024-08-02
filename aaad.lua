@@ -207,7 +207,7 @@ return {
             end
             local NewLabel = Round2px()
             local LabelHeight = math.max(Y, 60) -- Ensure label height is at least 60 to accommodate the icon
-            NewLabel.Size = UDim2.new(1, 20, 0, LabelHeight)
+            NewLabel.Size = UDim2.new(1, 0, 20, LabelHeight)
             NewLabel.Position = UDim2.new(-1, 20, 0, CalculateBounds(CachedObjects).Y + (Padding * #CachedObjects))
 
             -- Create and set up the icon
